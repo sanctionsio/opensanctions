@@ -45,10 +45,11 @@ services:
   app:
     build: .
     image: ghcr.io/opensanctions/opensanctions:latest
-    command: bash -c 'while !</dev/tcp/db/5432; do sleep 2; done; opensanctions crawl'
+    command: tail -f /dev/null
     hostname: work
     environment:
       OPENSANCTIONS_DATABASE_URI: postgresql://os:os@db/opensanctions
+      OPENSANCTIONS_RESOLVER_PATH: 'data/resolver_file.json'
     volumes:
       - "./data:/opensanctions/data"
       - "./opensanctions:/opensanctions/opensanctions"

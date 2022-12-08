@@ -1,37 +1,36 @@
-import json
 import hashlib
+import json
 import mimetypes
 from functools import cached_property
-from typing import Iterable, cast, Dict, Optional
-from lxml import etree, html
-from requests.exceptions import RequestException
+from typing import Dict, Iterable, Optional, cast
+
 from datapatch import LookupException, Result
-from sqlalchemy import MetaData
-from zavod.context import GenericZavod
 from followthemoney.helpers import check_person_cutoff
-from structlog.contextvars import clear_contextvars, bind_contextvars
+from lxml import etree, html
 from nomenklatura.cache import Cache
-from nomenklatura.util import normalize_url
 from nomenklatura.judgement import Judgement
 from nomenklatura.matching import compare_scored
 from nomenklatura.resolver import Resolver
 from nomenklatura.statement import Statement
+from nomenklatura.util import normalize_url
+from requests.exceptions import RequestException
+from sqlalchemy import MetaData
+from structlog.contextvars import bind_contextvars, clear_contextvars
+from zavod.context import GenericZavod
 
 from opensanctions import settings
 from opensanctions.core.dataset import Dataset
-from opensanctions.core.entity import Entity
 from opensanctions.core.db import engine, engine_tx
+from opensanctions.core.entity import Entity
 from opensanctions.core.external import External
 from opensanctions.core.issues import clear_issues
 from opensanctions.core.resolver import AUTO_USER
-from opensanctions.core.resources import save_resource, clear_resources
+from opensanctions.core.resources import clear_resources, save_resource
 from opensanctions.core.source import Source
-from opensanctions.core.statements import count_entities
-from opensanctions.core.statements import cleanup_dataset, clear_statements
-from opensanctions.core.statements import save_statements
+from opensanctions.core.statements import cleanup_dataset, clear_statements, count_entities, save_statements
 
 
-class Context(GenericZavod[Entity]):
+class Context(GenericZavod[Entity, Dataset]):
     """A utility object to be passed into crawlers which supports
     emitting entities, accessing metadata and logging errors and
     warnings.
@@ -44,9 +43,8 @@ class Context(GenericZavod[Entity]):
     def __init__(self, dataset: Dataset):
         data_path = settings.DATASET_PATH.joinpath(dataset.name)
         super().__init__(
-            dataset.name,
+            dataset,
             Entity,
-            prefix=dataset.prefix,
             data_path=data_path,
         )
         self.dataset = dataset
