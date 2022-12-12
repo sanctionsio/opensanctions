@@ -42,7 +42,6 @@ prefixdate==0.4.1
 psycopg2-binary==2.9.5
 pyasn1==0.4.8
 Pygments==2.13.0
-PyICU==2.8.1
 pyparsing==3.0.9
 python-dateutil==2.8.2
 python-Levenshtein==0.20.8
